@@ -1,11 +1,13 @@
+import os
+
 import openai
 
 class AutcompleteSentence:
     sentence, context = None, None
 
     # here is the API key for OpenAI.
-    openai.api_key = ''
-git 
+    openai.api_key = os.getenv("key_chatgpt")
+
     def __init__(self, sentence, context):
         self.sentence, self.context = sentence, context
 
