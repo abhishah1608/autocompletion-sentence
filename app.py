@@ -33,7 +33,5 @@ def translate():
 
 if __name__ == '__main__':
     #serve(app, host="0.0.0.0", port=8080)
-    serve(TransLogger(app, setup_console_handler=False), host='127.0.0.1', port=8080)
-
-
+    serve(TransLogger(app, setup_console_handler=False), host='0.0.0.0', port=8080)
     app.run()
