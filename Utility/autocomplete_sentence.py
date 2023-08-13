@@ -5,7 +5,7 @@ class AutcompleteSentence:
 
     # here is the API key for OpenAI.
     openai.api_key = ''
-
+git 
     def __init__(self, sentence, context):
         self.sentence, self.context = sentence, context
 
