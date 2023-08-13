@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCompletion Chatbot</title>
+</head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+ .dropdown {
+    position: relative;
+    display: inline-block;
+    margin: 20px;
+}
+
+.dropbtn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #0056b3;
+}
+
+
+.chat-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.chat-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.chat-body {
+    padding: 10px;
+    overflow-y: scroll;
+    height: 400px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+</style>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            AutoSentence Completion Chatbot
+        </div>
+        <div class="chat-body" id="chat-body">
+            <!-- Chat messages will be dynamically added here -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    const chatBody = document.getElementById("chat-body");
+    const userInput = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-button");
+    var FirstTime = true;
+    sessionStorage.setItem('context',null);
+    sendButton.addEventListener("click", function () {
+        const userMessage = userInput.value.trim();
+        context = sessionStorage.getItem('context');
+        appendMessage(userMessage, "user");
+        if(FirstTime == false)
+        {
+            context = context + ". " + userMessage;
+            sessionStorage.setItem('context',context);
+        }
+        else
+        {
+            FirstTime = false;
+            sessionStorage.setItem('context',userMessage);
+        }
+
+        if (userMessage !== "") {
+
+            // call python translation api that uses chatgpt and append response to chatbot.
+            const data = {
+            sentence: userMessage,  // Set the text.
+                context : context
+        };
+
+        fetch('/auto-complete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.text())  // Note: Using response.text() instead of response.json()
+        .then(result => {
+            const res = result
+            appendMessage(res, "bot");
+            userInput.value = "";
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            appendMessage(error, "bot");
+        });
+
+
+
+        }
+    });
+
+    function appendMessage(message, sender) {
+        const messageElement = document.createElement("div");
+        messageElement.className = `message ${sender}`;
+        messageElement.textContent = sender + ":"+ message;
+        chatBody.appendChild(messageElement);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+});
+    </script>
+</body>
+</html>
